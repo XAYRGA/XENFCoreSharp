@@ -16,11 +16,12 @@ namespace XENFCoreSharp.Bot
         public static int getGroupConfigurationValue(TGChat chat, string value, int def)
         {
             MySqlDataReader cur;
-            var vname = SQL.escape(value);
-            var ok = SQL.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id,vname), out cur);
+            var vname = SQL2.escape(value);
+            var ok = SQL2.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id,vname), out cur);
             if (!ok)
             {
-                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL.getLastError());
+                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL2.getLastError());
+                Console.WriteLine(Environment.StackTrace);
                 if (cur != null && !cur.IsClosed )
                 {
                     cur.Close();
@@ -51,11 +52,12 @@ namespace XENFCoreSharp.Bot
         public static bool getGroupConfigurationValue(TGChat chat, string value, bool def)
         {
             MySqlDataReader cur;
-            var vname = SQL.escape(value);
-            var ok = SQL.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
+            var vname = SQL2.escape(value);
+            var ok = SQL2.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
             if (!ok)
             {
-                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL.getLastError());
+                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL2.getLastError());
+                Console.WriteLine(Environment.StackTrace);
                 if (cur != null)
                 {
                     cur.Close();
@@ -86,11 +88,12 @@ namespace XENFCoreSharp.Bot
         public static long getGroupConfigurationValue(TGChat chat, string value, long def)
         {
             MySqlDataReader cur;
-            var vname = SQL.escape(value);
-            var ok = SQL.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
+            var vname = SQL2.escape(value);
+            var ok = SQL2.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
             if (!ok)
             {
-                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL.getLastError());
+                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL2.getLastError());
+                Console.WriteLine(Environment.StackTrace);
                 if (cur != null)
                 {
                     cur.Close();
@@ -121,11 +124,12 @@ namespace XENFCoreSharp.Bot
         public static string getGroupConfigurationValue(TGChat chat, string value, string def)
         {
             MySqlDataReader cur;
-            var vname = SQL.escape(value);
-            var ok = SQL.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
+            var vname = SQL2.escape(value);
+            var ok = SQL2.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
             if (!ok)
             {
-                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL.getLastError());
+                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL2.getLastError());
+                Console.WriteLine(Environment.StackTrace);
                 if (cur != null)
                 {
                     cur.Close();
@@ -159,10 +163,11 @@ namespace XENFCoreSharp.Bot
         public static bool InitializeGroupConfiguration(TGChat chat)
         {
             int rowsAff = 0;
-            var success = SQL.NonQuery(string.Format("INSERT INTO `xenf_groupconfigs` (`group`) VALUES({0})", chat.id), out rowsAff);
+            var success = SQL2.NonQuery(string.Format("INSERT INTO `xenf_groupconfigs` (`group`) VALUES({0})", chat.id), out rowsAff);
             if (!success)
             {
-                Console.WriteLine("[!] Can't write configuration for {0} -- {1}", chat.id, SQL.getLastError());
+                Console.WriteLine("[!] Can't write configuration for {0} -- {1}", chat.id, SQL2.getLastError());
+                            Console.WriteLine(Environment.StackTrace);
                 return false;
             }
             Console.WriteLine("Wrote new configuration index for group {0}", chat.id);
@@ -173,10 +178,11 @@ namespace XENFCoreSharp.Bot
         public static XenforceGroupConfiguration getGroupConfiguration(TGChat chat)
         {
             MySqlDataReader cur;
-            var ok = SQL.Query(string.Format("SELECT * FROM xenf_groupconfigs WHERE `group`={0}", chat.id), out cur);
+            var ok = SQL2.Query(string.Format("SELECT * FROM xenf_groupconfigs WHERE `group`={0}", chat.id), out cur);
             if (!ok)
             {
-                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL.getLastError());
+                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL2.getLastError());
+                Console.WriteLine(Environment.StackTrace);
                 return null;
             }
             else
@@ -211,6 +217,154 @@ namespace XENFCoreSharp.Bot
             }
         }
 
+        public static int getGroupConfigurationValueX(TGChat chat, string value, int def)
+        {
+            MySqlDataReader cur;
+            var vname = SQL3.escape(value);
+            var ok = SQL3.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
+            if (!ok)
+            {
+                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL3.getLastError());
+                Console.WriteLine(Environment.StackTrace);
+                if (cur != null && !cur.IsClosed)
+                {
+                    cur.Close();
+                }
+                return def;
+            }
+            else
+            {
+                if (cur.HasRows)
+                {
+                    cur.Read();
+                    var b = (int)cur[value];
+                    cur.Close();
+                    return b;
+                }
+                else
+                {
+                    if (!cur.IsClosed)
+                    {
+                        cur.Close();
+                    }
+                    InitializeGroupConfiguration(chat);
+                    return def;
+                }
+            }
+        }
+
+        public static bool getGroupConfigurationValueX(TGChat chat, string value, bool def)
+        {
+            MySqlDataReader cur;
+            var vname = SQL3.escape(value);
+            var ok = SQL3.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
+            if (!ok)
+            {
+                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL3.getLastError());
+                Console.WriteLine(Environment.StackTrace);
+                if (cur != null)
+                {
+                    cur.Close();
+                }
+                return def;
+            }
+            else
+            {
+                if (cur.HasRows)
+                {
+                    cur.Read();
+                    var b = (int)cur[value] > 0;
+                    cur.Close();
+                    return b;
+                }
+                else
+                {
+                    if (cur != null && !cur.IsClosed)
+                    {
+                        cur.Close();
+                    }
+                    InitializeGroupConfiguration(chat);
+                    return def;
+                }
+            }
+        }
+
+        public static long getGroupConfigurationValueX(TGChat chat, string value, long def)
+        {
+            MySqlDataReader cur;
+            var vname = SQL3.escape(value);
+            var ok = SQL3.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
+            if (!ok)
+            {
+                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL3.getLastError());
+                Console.WriteLine(Environment.StackTrace);
+                if (cur != null)
+                {
+                    cur.Close();
+                }
+                return def;
+            }
+            else
+            {
+                if (cur.HasRows)
+                {
+                    cur.Read();
+                    var b = (long)cur[value];
+                    cur.Close();
+                    return b;
+                }
+                else
+                {
+                    if (cur != null && !cur.IsClosed)
+                    {
+                        cur.Close();
+                    }
+                    InitializeGroupConfiguration(chat);
+                    return def;
+                }
+            }
+        }
+
+        public static string getGroupConfigurationValueX(TGChat chat, string value, string def)
+        {
+            MySqlDataReader cur;
+            var vname = SQL3.escape(value);
+            var ok = SQL3.Query(string.Format("SELECT `{1}` FROM xenf_groupconfigs WHERE `group`={0}", chat.id, vname), out cur);
+            if (!ok)
+            {
+                Console.WriteLine("[!] Error reading chat information for {0} -- {1}", chat.id, SQL3.getLastError());
+                Console.WriteLine(Environment.StackTrace);
+                if (cur != null)
+                {
+                    cur.Close();
+                }
+                return def;
+            }
+            else
+            {
+                if (cur.HasRows)
+                {
+                    cur.Read();
+                    var b = (string)cur[value];
+                    if (cur != null)
+                    {
+                        cur.Close();
+                    }
+                    return b;
+                }
+                else
+                {
+                    if (!cur.IsClosed)
+                    {
+                        cur.Close();
+                    }
+                    InitializeGroupConfiguration(chat);
+                    return def;
+                }
+            }
+        }
+
+
 
         public static bool writeGroupConfiguration(TGChat chat,string index, bool value)
         {
@@ -220,7 +374,7 @@ namespace XENFCoreSharp.Bot
                 ivar = 1;
 
             int ra = 0;
-            var success = SQL.NonQuery(string.Format(query, SQL.escape(index), ivar, chat.id),out ra );
+            var success = SQL2.NonQuery(string.Format(query, SQL2.escape(index), ivar, chat.id),out ra );
             if (!success || ra==0)
             {
                 return false;
@@ -234,7 +388,7 @@ namespace XENFCoreSharp.Bot
   
             int ra = 0;
 
-            var success = SQL.NonQuery(string.Format(query, SQL.escape(index), value, chat.id), out ra);
+            var success = SQL2.NonQuery(string.Format(query, SQL2.escape(index), value, chat.id), out ra);
 
             if (!success || ra == 0)
             {
@@ -250,7 +404,7 @@ namespace XENFCoreSharp.Bot
 
             int ra = 0;
 
-            var success = SQL.NonQuery(string.Format(query, SQL.escape(index), SQL.escape(value), chat.id), out ra);
+            var success = SQL2.NonQuery(string.Format(query, SQL2.escape(index), SQL2.escape(value), chat.id), out ra);
 
             if (!success || ra == 0)
             {

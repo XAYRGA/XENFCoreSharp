@@ -10,7 +10,7 @@ using MySql.Data.MySqlClient;
 
 namespace XENFCoreSharp
 {
-    public static class SQL
+    public static class SQL3
     {
 
         static string lastError;
@@ -19,7 +19,6 @@ namespace XENFCoreSharp
         static string pa;
         static string ho;
         static string da;
-        static MySqlDataReader rdr2; 
 
         public static bool Init(string host, string user, string password, string db)
         {
@@ -41,14 +40,14 @@ namespace XENFCoreSharp
             sqlConnection = new MySqlConnection(conStr);
             try
             {
-                Helpers.warn("SQL is reconnecting.");
+                Helpers.warn("SQL3 is reconnecting.");
                 sqlConnection.Open();
-                Helpers.warn("SQL Connected.");
+                Helpers.warn("SQL3 Connected.");
                 return true;
             }
             catch (MySqlException E) {
                 lastError = E.Message;
-                Helpers.warn("SQL couldn't connect: " + lastError);
+                Helpers.warn("SQL3 couldn't connect: " + lastError);
                 return false;
             }
         }
@@ -71,14 +70,6 @@ namespace XENFCoreSharp
         public static bool Query(string query, out MySqlDataReader rdr)
         {
             rdr = null;
-
-            if (rdr2 != null)
-            {
-                if (!rdr2.IsClosed)
-                {
-                    rdr2.Close();
-                }
-            }
             
             if (!CheckConnection())
             {

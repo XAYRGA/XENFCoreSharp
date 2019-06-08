@@ -126,6 +126,9 @@ namespace XENFCoreSharp.DoubleDecker
 
         public bool isSenderAdmin()
         {
+            var ChatMem = Telegram.getChatMember(chat, from);
+            if (ChatMem.status == "creator" || ChatMem.status == "admin" || ChatMem.status == "administrator")
+                return true;
 
 
             return false;

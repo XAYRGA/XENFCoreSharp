@@ -13,6 +13,7 @@ namespace XENFCoreSharp.Bot.Filters
         private static string[] ShitNames =
         {
             "BINANCE",
+            "Binance",
             "Information",
             "Info",
             "Notice",

@@ -28,7 +28,7 @@ namespace XENFCoreSharp.Bot.Filters
         public static bool captcha_CheckExpired()
         {
             MySql.Data.MySqlClient.MySqlDataReader cur;
-            var ss = SQL2.Query("SELECT * FROM xen_activations WHERE activated=0 OR activation_checked=0",out cur);
+            var ss = SQL3.Query("SELECT * FROM xen_activations WHERE activated=0 OR activation_checked=0",out cur);
             if (!ss)
             {
                 Console.WriteLine("Query for activation checks failed {0}", SQL.getLastError());
@@ -41,12 +41,16 @@ namespace XENFCoreSharp.Bot.Filters
             Stack<CaptchaActivationIndex> captchaActivationIndices  = new Stack<CaptchaActivationIndex>(1024); // hax? 
                                                                                                                // totally hax, I have to pull group configuration to check and see if the group has specific features enabled.
                                                                                                                // But I can't do that if I already have an SQL cursor open. So i'll have to read all of the results of it
-                                                                                                               // before I can make a call to get group configuration.
-            while (cur.HasRows)
+
+
+            // before I can make a call to get group configuration.
+
+            var ib = 0;
+           
+            while (cur.Read())
             {
-                cur.Read();
-            
-               
+                ib++;
+               // Console.WriteLine(ib);
                 var b = new CaptchaActivationIndex
                 {
                     index = (long)cur["index"],
@@ -61,7 +65,8 @@ namespace XENFCoreSharp.Bot.Filters
                 };
 
                 captchaActivationIndices.Push(b);
-                cur.NextResult();
+               
+            
             }
             cur.Close();  // close it up. 
 
@@ -72,10 +77,10 @@ namespace XENFCoreSharp.Bot.Filters
                 var user = new TGUser();
                 user.id = CurrentActivation.forwho;
                 chat.id = CurrentActivation.group;
-                var kicktime = XenforceRoot.getGroupConfigurationValue(chat, "kicktime", 30);
-                var announce = XenforceRoot.getGroupConfigurationValue(chat, "announcekicks",1);
-                var unmute = XenforceRoot.getGroupConfigurationValue(chat, "muteuntilverified", 0);
-
+                var kicktime = XenforceRoot.getGroupConfigurationValueX(chat, "kicktime", 30);
+                var announce = XenforceRoot.getGroupConfigurationValueX(chat, "announcekicks",1);
+                var unmute = XenforceRoot.getGroupConfigurationValueX(chat, "muteuntilverified", 0);
+                //Console.WriteLine("Wtf {0} {1}",CurrentActivation.activated,CurrentActivation.activation_checked);
                 if (CurrentActivation.activated==0)
                 {
                     if (CurrentActivation.whencreated < Helpers.getUnixTime() - (kicktime * 60))
@@ -147,29 +152,43 @@ namespace XENFCoreSharp.Bot.Filters
                 FullMessage += "\n\nYou will not be able to send any messages until you've verified.";
             }
 
-            var message = msg.replySendMessage(FullMessage);
+            var message =  msg.replySendMessage(FullMessage);
 
             // INSERT INTO xen_activations (activation_id,group,forwho,whencreated,actmessage,username) VALUES ('{0}',{1},{2},{3},{4},'{5}');
 
-            var statement =
-                string.Format("INSERT INTO xen_activations (`activation_id`,`group`,`forwho`,`whencreated`,`actmessage`,`username`) VALUES ('{0}',{1},{2},{3},{4},'{5}')",
-                SQL.escape(ActivationID),
-                GroupID,
-                UserID,
-                instance_time,
-                message.message_id,
-                SQL.escape(user_name_full)
-                );
-            int ra = 0;
-            SQL.NonQuery(statement, out ra);
-            if (ra < 1)
+            if (message == null || GroupID == null || instance_time == null || user_name_full == null || ActivationID==null)
             {
-                Console.WriteLine("Creating activation ID failed. No SQL rows affected.");
-                var cmsg = msg.replySendMessage("CreateActivationID() FAILED:\n\n Info:\n\n" + SQL.getLastError());
-                XenforceRoot.AddCleanupMessage(message.chat.id, cmsg.message_id, 120);
+                try
+                {
+                    Console.WriteLine("MESSAGE IS NULL OR SOMETHING");
+                    Console.WriteLine("PROBLEM: {0} {1}", message, user_name_full);
+                }
+                catch { }
+            } else 
 
+            {
+                var statement =
+                    string.Format("INSERT INTO xen_activations (`activation_id`,`group`,`forwho`,`whencreated`,`actmessage`,`username`) VALUES ('{0}',{1},{2},{3},{4},'{5}')",
+                    SQL.escape(ActivationID),
+                    GroupID,
+                    UserID,
+                    instance_time,
+                    message.message_id,
+                    SQL.escape(user_name_full)
+                    );
+                int ra = 0;
+                SQL.NonQuery(statement, out ra);
+                if (ra < 1)
+                {
+                    Console.WriteLine("Creating activation ID failed. No SQL rows affected.");
+                    var cmsg = msg.replySendMessage("CreateActivationID() FAILED:\n\n Info:\n\n" + SQL.getLastError());
+                    XenforceRoot.AddCleanupMessage(message.chat.id, cmsg.message_id, 120);
+
+                }
+
+                return false;
             }
-            return false; 
+            return false;
         }
     
     }

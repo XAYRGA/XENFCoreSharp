@@ -63,7 +63,7 @@ namespace XENFCoreSharp.DoubleDecker
             b["chat_id"] = chat.id.ToString();
             b["user_id"] = user.id.ToString();
 
-            TGResponse resp = apiGetRequest("getUpdates", b);
+            TGResponse resp = apiGetRequest("getChatMember", b);
             if (resp.ok == true)
             {
                 var rede = resp.result.CreateReader();
@@ -169,6 +169,7 @@ namespace XENFCoreSharp.DoubleDecker
 
         public static TGMessage sendMessage(TGChat chat, string message)
         {
+            Console.WriteLine("SENDING MESSAGE");
             var b = new NameValueCollection();
             b["chat_id"] = chat.id.ToString();
             b["text"] = message;
@@ -201,6 +202,7 @@ namespace XENFCoreSharp.DoubleDecker
 
         public static bool deleteMessage(TGChat chat, long MessageID)
         {
+            Console.WriteLine("DELETE MSG");
             var b = new NameValueCollection();
             b["chat_id"] = chat.id.ToString();
             b["message_id"] = MessageID.ToString();
@@ -217,6 +219,7 @@ namespace XENFCoreSharp.DoubleDecker
 
         public static bool deleteMessage(TGChat chat, TGMessage message)
         {
+            Console.WriteLine("DELETE MSG 2");
             var b = new NameValueCollection();
             b["chat_id"] = chat.id.ToString();
             b["message_id"] = message.message_id.ToString();
@@ -233,6 +236,7 @@ namespace XENFCoreSharp.DoubleDecker
 
         public static TGMessage sendMessage(TGChat chat, string message,string parse_mode)
         {
+            Console.WriteLine("SENDING MESSAGE 2");
             var b = new NameValueCollection();
 
             b["chat_id"] = chat.id.ToString();

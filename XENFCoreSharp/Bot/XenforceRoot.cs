@@ -40,7 +40,7 @@ namespace XENFCoreSharp.Bot
 
             Stack<long> MessageCleanupIndicies = new Stack<long>(32);
 
-            var ok1 = SQL2.Query(query, out data);
+            var ok1 = SQL3.Query(query, out data);
            // Console.WriteLine(ok1);
             if (!ok1 || data==null)
             {
@@ -48,9 +48,9 @@ namespace XENFCoreSharp.Bot
                 return;
             }
             var MessageIndex = 0;
-            while (data.HasRows)
+            while (data.Read())
             {
-                data.Read();
+               
 
                 var idx = (int)data["index"];
                 var grp = (long)data["group"];
@@ -63,12 +63,12 @@ namespace XENFCoreSharp.Bot
                     var chat = new TGChat();
                     chat.id = grp;
                     Telegram.deleteMessage(chat, mid);
-                    MessageCleanupIndicies.Push(MessageIndex);
+                    MessageCleanupIndicies.Push(idx);
                 }
 
-                data.NextResult();
+             
                 MessageIndex++; 
-                if (MessageIndex > 32)
+                if (MessageIndex > 30)
                 {
                     break;
                 }
@@ -77,6 +77,7 @@ namespace XENFCoreSharp.Bot
 
             while (MessageCleanupIndicies.Count > 0) // Had to do this,  no concurrent queries. 
             {
+                Console.WriteLine("CLEANUP?");
                 var mid = MessageCleanupIndicies.Pop();
                 int ra = 0;
                 var ok = SQL2.NonQuery("DELETE FROM xenf_spoken WHERE `index`=" + mid, out ra);
@@ -172,8 +173,15 @@ namespace XENFCoreSharp.Bot
         {
             while (true)
             {
-                DoMessageCleanup();
-                Filters.XESFilter.captcha_CheckExpired();
+           
+                try
+                {
+                    DoMessageCleanup();
+                    Filters.XESFilter.captcha_CheckExpired();
+                } catch (Exception E)
+                {
+                    Console.WriteLine(E);
+                }
                 Thread.Sleep(2000);
             }
         }

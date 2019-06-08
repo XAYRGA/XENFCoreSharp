@@ -39,6 +39,17 @@ namespace XENFCoreSharp
                 return;
             }
 
+            initValue = SQL3.Init(Configuration.getValue("MySQLHost"), Configuration.getValue("MySQLUser"), Configuration.getValue("MySQLPassword"), Configuration.getValue("MySQLDatabase"));
+
+            if (!initValue)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Initialization stopped: Failed to connect to MySQL server.");
+                Console.ReadLine();
+                return;
+            }
+
+
 
 
             Console.WriteLine("Initializing Telegram API");
