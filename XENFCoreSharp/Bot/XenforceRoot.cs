@@ -174,7 +174,6 @@ namespace XENFCoreSharp.Bot
         {
             while (true)
             {
-           
                 try
                 {
                     DoMessageCleanup();

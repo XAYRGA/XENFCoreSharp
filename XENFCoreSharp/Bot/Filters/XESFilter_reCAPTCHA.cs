@@ -79,7 +79,7 @@ namespace XENFCoreSharp.Bot.Filters
                 chat.id = CurrentActivation.group;
                 var kicktime = XenforceRoot.getGroupConfigurationValueX(chat, "kicktime", 30);
                 var announce = XenforceRoot.getGroupConfigurationValueX(chat, "announcekicks",1);
-                var unmute = XenforceRoot.getGroupConfigurationValueX(chat, "muteuntilverified", 0);
+                var unmute = XenforceRoot.getGroupConfigurationValueX(chat, "muteuntilverified", false);
                 //Console.WriteLine("Wtf {0} {1}",CurrentActivation.activated,CurrentActivation.activation_checked);
                 if (CurrentActivation.activated==0)
                 {
@@ -114,6 +114,11 @@ namespace XENFCoreSharp.Bot.Filters
                     if (mymessage != null)
                     {
                         XenforceRoot.AddCleanupMessage(chat.id, mymessage.message_id, 30); // Clean up after 30 seconds.
+                    }
+
+                    if (unmute)
+                    {
+                        Telegram.restrictChatMember(chat, user, 0, true, true, true, true);
                     }
                 }
             }
