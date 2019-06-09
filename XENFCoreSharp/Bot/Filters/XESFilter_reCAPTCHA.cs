@@ -88,13 +88,17 @@ namespace XENFCoreSharp.Bot.Filters
                         Telegram.deleteMessage(chat, CurrentActivation.actmessage);
                         Telegram.kickChatMember(chat, user, 0); // kick them from the chat. 
                         Console.WriteLine("Remove user?");
+                        var rar = 0;
+                        var ok = SQL2.NonQuery(string.Format("DELETE FROM xen_activations WHERE activation_id='{0}'", CurrentActivation.activation_id), out rar);
                         if (announce > 0)
                         {
                             var mymessage = Telegram.sendMessage(chat, CurrentActivation.username + " was removed from the chat for not completing the CAPTCHA.");
-                            XenforceRoot.AddCleanupMessage(chat.id, mymessage.message_id, 30 ); // Clean up after 30 seconds.
+                            if (mymessage != null)
+                            {
+                                XenforceRoot.AddCleanupMessage(chat.id, mymessage.message_id, 30); // Clean up after 30 seconds.
+                            }
                         }
-                        var rar = 0;
-                        var ok = SQL2.NonQuery(string.Format("DELETE FROM xen_activations WHERE activation_id='{0}'",CurrentActivation.activation_id),out rar);
+    
 
                     }
                 } else if (CurrentActivation.activated==1 && CurrentActivation.activation_checked==0)
@@ -107,7 +111,10 @@ namespace XENFCoreSharp.Bot.Filters
                     {
                         Console.WriteLine("Updating activation message failed! Might spam!!!?");
                     }
-                    XenforceRoot.AddCleanupMessage(chat.id, mymessage.message_id, 30); // Clean up after 30 seconds.
+                    if (mymessage != null)
+                    {
+                        XenforceRoot.AddCleanupMessage(chat.id, mymessage.message_id, 30); // Clean up after 30 seconds.
+                    }
                 }
             }
             return true;
@@ -182,7 +189,10 @@ namespace XENFCoreSharp.Bot.Filters
                 {
                     Console.WriteLine("Creating activation ID failed. No SQL rows affected.");
                     var cmsg = msg.replySendMessage("CreateActivationID() FAILED:\n\n Info:\n\n" + SQL.getLastError());
-                    XenforceRoot.AddCleanupMessage(message.chat.id, cmsg.message_id, 120);
+                    if (cmsg != null)
+                    {
+                        XenforceRoot.AddCleanupMessage(message.chat.id, cmsg.message_id, 120);
+                    }
 
                 }
 

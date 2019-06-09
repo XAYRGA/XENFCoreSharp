@@ -108,6 +108,7 @@ namespace XENFCoreSharp.Bot
                 {
                     Console.WriteLine("NULL Update Array:", Telegram.lastError);
                     Thread.Sleep(250);
+                    continue;
                 }
 
                 Console.WriteLine("Grabbed {0} updates.", b.Length);
