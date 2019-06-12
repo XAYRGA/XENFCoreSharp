@@ -147,7 +147,7 @@ namespace XENFCoreSharp.Bot.Filters
 
             var FullMessage = string.Format(
                 "Welcome, @{0}. \n" +
-                "to the chat! Please complete a quick captcha with {2} minutes to verify you're not a bot: \n\n" +
+                "to the chat! Please complete a quick captcha within {2} minutes to verify you're not a bot: \n\n" +
                 "{1}",
 
                 user_name_full,
