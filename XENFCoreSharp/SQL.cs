@@ -88,6 +88,7 @@ namespace XENFCoreSharp
             try
             {
                 rdr = comm.ExecuteReader();
+                rdr2 = rdr;
                 return true;
             }
             catch (MySqlException E)

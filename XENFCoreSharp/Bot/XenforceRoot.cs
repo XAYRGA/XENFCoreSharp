@@ -160,7 +160,7 @@ namespace XENFCoreSharp.Bot
                         {
                             for (int bq=0; bq < message.new_chat_members.Length;bq++)
                             {
-                                XenforceUserFilter.doFilterUser(message,message.new_chat_members[bq]);
+                               XenforceUserFilter.doFilterUser(message,message.new_chat_members[bq]);
                             }
                         }
 

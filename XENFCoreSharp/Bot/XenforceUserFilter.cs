@@ -15,13 +15,19 @@ namespace XENFCoreSharp.Bot
         {
             if (!user.is_bot)
             {
-                bool b = false;
-                b = Filters.XESFilter.autorem(msg, user);
-                if (b == true) { return; }
-                b = Filters.XESFilter.namefilter(msg, user);
-                if (b == true) { return; }
-                b = Filters.XESFilter.captcha(msg, user);
-                if (b == true) { return; }
+                try
+                {
+                    bool b = false;
+                    b = Filters.XESFilter.autorem(msg, user);
+                    if (b == true) { return; }
+                    b = Filters.XESFilter.namefilter(msg, user);
+                    if (b == true) { return; }
+                    b = Filters.XESFilter.captcha(msg, user);
+                    if (b == true) { return; }
+                } catch (Exception E)
+                {
+                    Console.WriteLine("Fucking seriously?\n{0}", E.ToString());
+                }
             }
         }        
     }
