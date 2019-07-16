@@ -10,7 +10,7 @@
 		$ip = $_SERVER['REMOTE_ADDR'];
 	}
 	if (isset($_GET['actid'])) {
-			$actid =  mysqli_real_escape_string($DB_OBJ, $_GET['actid']);
+			$actid =  $_GET['actid'];
 	} else {
 			$actid = "!!NONE3!!";
 	}
@@ -46,24 +46,25 @@ $resp_dec = json_decode((string)$response);
 if ($resp_dec->success==false) {
 	header('Location: ./index.php' . "?success=0&reason=Recaptcha validation failed&actid=$actid");
 } else {
-	
-	
-				
-			
-				
-	
-			$rpquery = "UPDATE xen_activations SET activated=1 WHERE activation_id='$actid'";
-			$res = $DB_OBJ->query($rpquery);
-			
-			if ($res==false) {
-						echo($DB_OBJ->error);
-						die();
-					header('Location: ./index.php' . "?success=0&reason=Database error. &actid=$actid");
-			
-			}
-				
-	
-	
+
+	if (!($stmt = $mysqli->prepare(" UPDATE xen_activations SET activated=1 WHERE activation_id=? "))) {
+	    echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+	    die();
+	}
+	if (!$stmt->bind_param("s", $actid)) {
+	    echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+	    die();
+	}
+	if (!$stmt->execute()) {
+	    echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+	    die();
+	}
+	if ($stmt->affected_rows <> 1) {
+    	// to be successful, this needs to have altered exactly one row
+	    // this means that the query succeeded, but it did not alter exactly 1 row
+    	die();
+	}
+
 	header('Location: ./index.php' . "?success=1&reason=Successfully verified that you're human :)&actid=$actid");
 }
 
