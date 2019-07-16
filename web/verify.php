@@ -1,7 +1,7 @@
 <?php 
 	define('USE_DATABASE',1);
 	include 'databank.php';
-	$secret = "I'm all about open source, but I can't share this with you!";
+	$secret = "I'm all about open source, but i can't share this with you.";
 	if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 		$ip = $_SERVER['HTTP_CLIENT_IP'];
 	} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -9,10 +9,11 @@
 	} else {
 		$ip = $_SERVER['REMOTE_ADDR'];
 	}
-	if (isset($_POST['actid'])) {
-		 $actid = $_POST['actid'];
+	if (isset($_GET['actid'])) {
+			$actid =  mysqli_real_escape_string($DB_OBJ, $_GET['actid']);
+	} else {
+			$actid = "!!NONE3!!";
 	}
-	
 
 	if (isset($_POST['g-recaptcha-response'])) {
 		 $resp = $_POST['g-recaptcha-response'];
