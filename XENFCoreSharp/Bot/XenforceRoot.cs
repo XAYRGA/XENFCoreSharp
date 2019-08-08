@@ -114,19 +114,41 @@ namespace XENFCoreSharp.Bot
                 Console.WriteLine("Grabbed {0} updates.", b.Length);
                 for (int i=0; i < b.Length; i++)
                 {
+
                     var CurrentUpdate = b[i];
                     if (CurrentUpdate.update_id > last_update)
                     {
                         last_update = CurrentUpdate.update_id;
                     }
+                    if (CurrentUpdate.edited_message!=null)
+                    {
+                        CurrentUpdate.message = CurrentUpdate.edited_message;
+                    }
+
                     if (CurrentUpdate.message != null)
                     {
                         var message = CurrentUpdate.message;
+
+                        if (message.from.is_bot)
+                        {
+                            continue; // don't need to process these
+                        }
 
                         CurrentGroupConfig = getGroupConfiguration(message.chat);
 
                         if (message.text!=null)
                         {
+
+                            try
+                            {
+                                XENFCoreSharp.Bot.Filters.XESFilter.doURLFilter(message, message.from);
+                            } catch (Exception E)
+                            {
+                                var file = Helpers.writeStack(E.ToString());
+                                message.replySendMessage("Hello -- Something terrible went wrong with XenfBot, please report this, and reference XES_STK_" + file);
+                            }
+
+
                             var varg_1 = message.text.Split((char)0x20);
                             if (varg_1.Length > 0)
                             {

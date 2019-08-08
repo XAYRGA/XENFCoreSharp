@@ -29,6 +29,7 @@ namespace XENFCoreSharp.DoubleDecker
     {
         public long update_id;
         public TGMessage message;
+        public TGMessage edited_message;
     }
 
     public class TGChat

@@ -71,6 +71,7 @@
     <Compile Include="Bot\Filters\XESFilter_namefilter.cs" />
     <Compile Include="Bot\Filters\XESFilter_autorem.cs" />
     <Compile Include="Bot\Filters\XESFilter_reCAPTCHA.cs" />
+    <Compile Include="Bot\Filters\XESFilter_urlKick.cs" />
     <Compile Include="Bot\XenforceCommandInterpreter.cs" />
     <Compile Include="Bot\XenforceConfiguration.cs" />
     <Compile Include="Bot\XenforceUserFilter.cs" />
