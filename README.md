@@ -33,10 +33,20 @@ Mutes a user until they complete recaptcha validation.
 Automatically kicks users Xenforce thinks is a bot
 
 
-/xen setbool autokick true  -- To turn on 
+/xen setbool autoban true  -- To turn on 
 
-/xen setbool autokick false -- to turn off
+/xen setbool autoban false -- to turn off
 
+
+
+**Autobannames (Default: on)**
+
+Automatically kicks users Xenforce thinks is a bot, based on name filter (embedded.)
+
+
+/xen setbool autobannames true  -- To turn on 
+
+/xen setbool autobannames false -- to turn off
 
 
 
