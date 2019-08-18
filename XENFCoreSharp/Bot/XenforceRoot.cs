@@ -136,6 +136,21 @@ namespace XENFCoreSharp.Bot
 
                         CurrentGroupConfig = getGroupConfiguration(message.chat);
 
+
+                        if (message.photo!=null)
+                        {
+                            try
+                            {
+                                XENFCoreSharp.Bot.Filters.XESFilter.doURLMediaFilter(message, message.from);
+                            }
+                            catch (Exception E)
+                            {
+                                var file = Helpers.writeStack(E.ToString());
+                                message.replySendMessage("Hello -- Something terrible went wrong with XenfBot, please report this, and reference XES_STK_" + file);
+                            }
+
+                        }
+
                         if (message.text!=null)
                         {
 

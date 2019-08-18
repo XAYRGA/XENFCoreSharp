@@ -84,6 +84,14 @@ namespace XENFCoreSharp.DoubleDecker
         public int total_count;
     }
 
+    public class TGPhotoSize
+    {
+        public string file_id;
+        public int width;
+        public int height;
+        public int file_size;
+    }
+
     public class TGMessage
     {
         public long message_id;
@@ -97,6 +105,7 @@ namespace XENFCoreSharp.DoubleDecker
         public string forward_sender_name;
         public int forward_date;
         public int edit_date;
+        public TGPhotoSize[] photo;
         public string text;
         public TGUser[] new_chat_members;
 
