@@ -43,6 +43,7 @@ namespace XENFCoreSharp.Bot.Filters
             var wtf = msg.replySendMessage(usr.first_name + " was removed from the chat for sending URL/Media before activating!");
             XenforceRoot.AddCleanupMessage(msg.chat.id, wtf.message_id, 30);
             Telegram.kickChatMember(msg.chat, msg.from, 30);
+            msg.delete();
         }
     }
 }
