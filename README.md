@@ -49,7 +49,14 @@ Automatically kicks users Xenforce thinks is a bot, based on name filter (embedd
 /xen setbool autobannames false -- to turn off
 
 
+**KickURLUnactivated (Default: on)**
 
+Automatically kicks users that post a link or photo before they complete the captcha.
+
+
+/xen setbool kickurlunactivated true  -- To turn on 
+
+/xen setbool kickurlunactivated false -- to turn off
 
 
 
