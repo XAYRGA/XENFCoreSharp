@@ -12,8 +12,8 @@ namespace XENFCoreSharp.Bot.Commands
 
         public static void sendHelp(TGMessage data,string[] arguments)
         {
-            data.replySendMessage("Xen Enforce Bot V3.1.4.5 (Serg--- Circle?)\n\nDocumentation on commands is available at http://www.xayr.ga/xenforce/");
-            throw new Exception("fuuuuck");
+            data.replySendMessage("Xen Enforce Bot V3.1.4.5 (Serg--- Circle?)\n\nDocumentation on commands is available at https://www.github.com/XAYRGA/XENFCoreSharp/");
+          
         }
 
 
