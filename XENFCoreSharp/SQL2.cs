@@ -69,22 +69,25 @@ namespace XENFCoreSharp
 
         public static bool Query(string query, out MySqlDataReader rdr)
         {
-            rdr = null;
-            
-            if (!CheckConnection())
+            lock (sqlConnection)
             {
-                return false;
-            }
-            MySqlCommand comm = new MySqlCommand(query, sqlConnection);
-            try
-            {
-                rdr = comm.ExecuteReader();
-                return true;
-            }
-            catch (MySqlException E)
-            {
-                lastError = E.Message;
-                return false;
+                rdr = null;
+
+                if (!CheckConnection())
+                {
+                    return false;
+                }
+                MySqlCommand comm = new MySqlCommand(query, sqlConnection);
+                try
+                {
+                    rdr = comm.ExecuteReader();
+                    return true;
+                }
+                catch (MySqlException E)
+                {
+                    lastError = E.Message;
+                    return false;
+                }
             }
         }
 
