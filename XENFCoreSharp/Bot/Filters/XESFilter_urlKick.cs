@@ -71,6 +71,25 @@ namespace XENFCoreSharp.Bot.Filters
             XenforceRoot.AddCleanupMessage(msg.chat.id, wtf.message_id, 30);
             Telegram.kickChatMember(msg.chat, msg.from, 30);
             msg.delete();
+
+
+            var statement =
+             string.Format("INSERT INTO xenf_autokick (`group`,`user`,`when`,`why`) VALUES ({0},{1},{2},'{3}')",
+             msg.chat.id,
+             msg.from.id,
+             Helpers.getUnixTime(),
+             "URLMedia_URL"
+           );
+            int ra = 0;
+            SQL.NonQuery(statement, out ra);
+            if (ra < 1)
+            {
+                Console.WriteLine("Creating autorem incident failed failed. No SQL rows affected.");
+                var cmsg = msg.replySendMessage("AutoremAddIncident() FAILED:\n\n Info:\n\n" + SQL.getLastError());
+                XenforceRoot.AddCleanupMessage(chat.id, cmsg.message_id, 120);
+            }
+
+
         }
     }
 }
