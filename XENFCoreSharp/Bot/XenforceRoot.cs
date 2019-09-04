@@ -146,7 +146,8 @@ namespace XENFCoreSharp.Bot
                             catch (Exception E)
                             {
                                 var file = Helpers.writeStack(E.ToString());
-                                message.replySendMessage("Hello -- Something terrible went wrong with XenfBot, please report this, and reference XES_STK_" + file);
+                                //message.replySendMessage("Hello -- Something terrible went wrong with XenfBot, please report this, and reference XES_STK_" + file);
+                                Console.WriteLine(E.ToString());
                             }
 
                         }
@@ -160,7 +161,8 @@ namespace XENFCoreSharp.Bot
                             } catch (Exception E)
                             {
                                 var file = Helpers.writeStack(E.ToString());
-                                message.replySendMessage("Hello -- Something terrible went wrong with XenfBot, please report this, and reference XES_STK_" + file);
+                                // message.replySendMessage("Hello -- Something terrible went wrong with XenfBot, please report this, and reference XES_STK_" + file);
+                                Console.WriteLine(E.ToString());
                             }
 
 
@@ -186,7 +188,7 @@ namespace XENFCoreSharp.Bot
                                     var successx = XenforceCommandInterpreter.ExecuteCommand("help", message, new string[0]);
                                     if (!successx)
                                     {
-                                        message.replySendMessage(XenforceCommandInterpreter.TRESULT);
+                                        //message.replySendMessage(XenforceCommandInterpreter.TRESULT);
                                     }
                                     continue;
                                 }
