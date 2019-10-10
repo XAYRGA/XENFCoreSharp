@@ -29,7 +29,7 @@ namespace XENFCoreSharp
                 Console.ReadLine();
                 return;
             }
-            initValue = SQL2.Init(Configuration.getValue("MySQLHost"), Configuration.getValue("MySQLUser"), Configuration.getValue("MySQLPassword"), Configuration.getValue("MySQLDatabase"));
+            initValue = SQL.Init(Configuration.getValue("MySQLHost"), Configuration.getValue("MySQLUser"), Configuration.getValue("MySQLPassword"), Configuration.getValue("MySQLDatabase"));
 
             if (!initValue)
             {
@@ -39,7 +39,7 @@ namespace XENFCoreSharp
                 return;
             }
 
-            initValue = SQL3.Init(Configuration.getValue("MySQLHost"), Configuration.getValue("MySQLUser"), Configuration.getValue("MySQLPassword"), Configuration.getValue("MySQLDatabase"));
+            initValue = SQL.Init(Configuration.getValue("MySQLHost"), Configuration.getValue("MySQLUser"), Configuration.getValue("MySQLPassword"), Configuration.getValue("MySQLDatabase"));
 
             if (!initValue)
             {

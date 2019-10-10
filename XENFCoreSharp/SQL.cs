@@ -6,61 +6,50 @@ using System.Threading.Tasks;
 using MySql.Data;
 using MySql;
 using MySql.Data.MySqlClient;
-
+using XENFCoreSharp.SQLSys;
 
 namespace XENFCoreSharp
 {
+    public class SQLQueryInstance
+    {
+        public MySqlConnection connection;
+        public MySqlDataReader reader;
+        public bool Finish()
+        {
+            if (reader!=null && !reader.IsClosed)
+            {
+                reader.Close();
+            }
+            if (connection != null)
+            {
+                SQL.returnConnection(connection);
+            }
+            return true;
+        }
+    }
+
     public static class SQL
     {
-
         static string lastError;
-        static public MySqlConnection sqlConnection;
-        static string us;
-        static string pa;
-        static string ho;
-        static string da;
-        static MySqlDataReader rdr2; 
+        static SQLConnectionManager connectionManager;
 
         public static bool Init(string host, string user, string password, string db)
         {
-            ho = host;
-            us = user;
-            pa = password;
-            da = db;
-            return Reconnect();
+            var connectInfo = new SQLConnectionInformation
+            {
+                host = host,
+                username = user,
+                password = password,
+                database = db,
+            };
+
+            connectionManager = new SQLConnectionManager(connectInfo, 10);
+            return true;        
         }
 
-        public static bool DEBUGKill()
+        public static void returnConnection(MySqlConnection conn)
         {
-            sqlConnection.Close();
-            return true;
-        }
-        public static bool Reconnect()
-        {
-            string conStr = string.Format("server={0};user={1};database={2};port=3306;password={3}", ho, us, da, pa);
-            sqlConnection = new MySqlConnection(conStr);
-            try
-            {
-                Helpers.warn("SQL is reconnecting.");
-                sqlConnection.Open();
-                Helpers.warn("SQL Connected.");
-                return true;
-            }
-            catch (MySqlException E) {
-                lastError = E.Message;
-                Helpers.warn("SQL couldn't connect: " + lastError);
-                return false;
-            }
-        }
-
-        public static bool CheckConnection()
-        {
-            if (sqlConnection.State == System.Data.ConnectionState.Broken | sqlConnection.State == System.Data.ConnectionState.Closed)
-            {
-                Reconnect();
-                return false;
-            }
-            return sqlConnection.State == System.Data.ConnectionState.Open;
+            connectionManager.returnConnection(conn);
         }
 
         public static string escape(string esc)
@@ -68,35 +57,27 @@ namespace XENFCoreSharp
             return MySqlHelper.EscapeString(esc);
         }
 
-        public static bool Query(string query, out MySqlDataReader rdr)
+        public static bool Query(string query, out SQLQueryInstance qLQueryInstance)
         {
-            rdr = null;
+            var qi = new SQLQueryInstance();
+            var conn = connectionManager.getConnection();
+            qi.connection = conn;
 
-            lock (sqlConnection)
+            var wtf = new MySqlCommand(query, conn);
+            try
             {
+                var wtf2 = wtf.ExecuteReader();
+                qi.reader = wtf2;
+                qLQueryInstance = qi;
+              
 
-                if (rdr2 != null)
-                {
-                    if (!rdr2.IsClosed)
-                    {
-                        rdr2.Close();
-                    }
-                }
-
-                if (!CheckConnection())
-                {
-                    return false;
-                }
-                MySqlCommand comm = new MySqlCommand(query, sqlConnection);
-                try
-                {
-                    rdr = comm.ExecuteReader();
-                    rdr2 = rdr;
-                    return true;
-                }
-                catch (MySqlException E)
+                return true; 
+            } catch (MySqlException E) {
+                lock (lastError)
                 {
                     lastError = E.Message;
+                    connectionManager.returnConnection(conn);
+                    qLQueryInstance = null; 
                     return false;
                 }
             }
@@ -105,18 +86,20 @@ namespace XENFCoreSharp
         public static bool NonQuery(string data, out int rowsAffected)
         {
             rowsAffected = 0;
-            if (!CheckConnection())
-            {
-                return false;
-            }
-            MySqlCommand comm = new MySqlCommand(data, sqlConnection);
+            var conn = connectionManager.getConnection(); 
+            MySqlCommand comm = new MySqlCommand(data, conn);
             try
             {
                 rowsAffected = comm.ExecuteNonQuery();
+                connectionManager.returnConnection(conn);
                 return true;
             } catch (MySqlException E)
             {
-                lastError = E.Message;
+                lock (lastError)
+                {
+                    lastError = E.Message;
+                }
+                connectionManager.returnConnection(conn);
                 return false;
             }
         }

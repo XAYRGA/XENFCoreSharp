@@ -36,17 +36,19 @@ namespace XENFCoreSharp.Bot
         public static void DoMessageCleanup()
         {
             var query = "SELECT * FROM xenf_spoken";
+            SQLQueryInstance QueryInst;
             MySqlDataReader data;
 
             Stack<long> MessageCleanupIndicies = new Stack<long>(32);
 
-            var ok1 = SQL3.Query(query, out data);
+            var ok1 = SQL.Query(query, out QueryInst);
            // Console.WriteLine(ok1);
-            if (!ok1 || data==null)
+            if (!ok1 || QueryInst==null)
             {
-                Console.WriteLine("Failed to clean up messages {0}", SQL2.getLastError());
+                Console.WriteLine("Failed to clean up messages {0}", SQL.getLastError());
                 return;
             }
+            data = QueryInst.reader;
             var MessageIndex = 0;
             while (data.Read())
             {
@@ -73,17 +75,17 @@ namespace XENFCoreSharp.Bot
                     break;
                 }
             }
-            data.Close();
+            QueryInst.Finish();
 
             while (MessageCleanupIndicies.Count > 0) // Had to do this,  no concurrent queries. 
             {
                 Console.WriteLine("CLEANUP?");
                 var mid = MessageCleanupIndicies.Pop();
                 int ra = 0;
-                var ok = SQL2.NonQuery("DELETE FROM xenf_spoken WHERE `index`=" + mid, out ra);
+                var ok = SQL.NonQuery("DELETE FROM xenf_spoken WHERE `index`=" + mid, out ra);
                 if (!ok)
                 {
-                    Console.WriteLine("Message cannot be cleaned up {0}", SQL2.getLastError());
+                    Console.WriteLine("Message cannot be cleaned up {0}", SQL.getLastError());
                 }
             }
         }

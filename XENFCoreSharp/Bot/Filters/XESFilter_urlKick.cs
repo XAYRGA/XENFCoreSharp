@@ -35,13 +35,19 @@ namespace XENFCoreSharp.Bot.Filters
                 contains_atleast = true;
             }
 
+
+            if (msg_lower.Contains(".ly"))
+            {
+                contains_atleast = true;
+            }
+
             if (!contains_atleast) // It's cheaper to check this filters condition first than it is to make sql queries.
                 return; 
 
 
             var chat = msg.chat; // grab chat.
 
-            var enabled = XenforceRoot.getGroupConfigurationValueX(chat, "kickurlunactivated", false); // Check configuration value.
+            var enabled = XenforceRoot.getGroupConfigurationValue(chat, "kickurlunactivated", false); // Check configuration value.
 
             if (!enabled) // return if not enabled.
                 return;
@@ -49,19 +55,20 @@ namespace XENFCoreSharp.Bot.Filters
             var qsc = "SELECT * FROM xen_activations WHERE activated=0 AND `group`={0} AND `forwho`={1}"; // 
 
             var rqry = string.Format(qsc, chat.id, usr.id);
-            MySql.Data.MySqlClient.MySqlDataReader datar;
+            SQLQueryInstance QueryInst;
 
-            var queryok = SQL3.Query(rqry, out datar);
+
+            var queryok = SQL.Query(rqry, out QueryInst);
             bool onerow = false;
 
-            if (datar != null && datar.HasRows) // They've already been kicked before. If we return at least one row, then its valid to assume they havent activated 
+            if (QueryInst!= null && QueryInst.reader.HasRows) // They've already been kicked before. If we return at least one row, then its valid to assume they havent activated 
             { // There can only be one activation index per user per group.
                 onerow = true;               
             }
 
-            if (datar != null)
+            if (QueryInst != null)
             {
-                datar.Close();
+                QueryInst.Finish();
             }
 
             if (!onerow)

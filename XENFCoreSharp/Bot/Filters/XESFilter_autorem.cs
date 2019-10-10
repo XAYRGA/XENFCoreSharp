@@ -18,16 +18,16 @@ namespace XENFCoreSharp.Bot.Filters
             var qsc = "SELECT * FROM xenf_autokick WHERE `group`={0} AND `user`={1}";
             var rqry = string.Format(qsc, chat.id, usr.id);
             MySql.Data.MySqlClient.MySqlDataReader datar;
-
-            var queryok = SQL.Query(rqry, out datar);
-            if (datar!=null && datar.HasRows) // They've already been kicked before. 
+            SQLQueryInstance QueryInst; 
+            var queryok = SQL.Query(rqry, out QueryInst);
+            if (QueryInst!=null && QueryInst.reader.HasRows) // They've already been kicked before. 
             {
-                datar.Close();
+                QueryInst.Finish();
                 return false; 
             }
-            if (datar != null)
+            if (QueryInst != null)
             {
-                datar.Close();
+                QueryInst.Finish();
             }
 
             var UserID = usr.id;

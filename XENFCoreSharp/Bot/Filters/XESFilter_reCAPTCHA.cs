@@ -28,13 +28,15 @@ namespace XENFCoreSharp.Bot.Filters
         public static bool captcha_CheckExpired()
         {
             MySql.Data.MySqlClient.MySqlDataReader cur;
-            var ss = SQL3.Query("SELECT * FROM xen_activations WHERE activated=0 OR activation_checked=0",out cur);
+            SQLQueryInstance QueryInst; 
+
+            var ss = SQL.Query("SELECT * FROM xen_activations WHERE activated=0 OR activation_checked=0",out QueryInst);
             if (!ss)
             {
                 Console.WriteLine("Query for activation checks failed {0}", SQL.getLastError());
-                if (cur!=null && !cur.IsClosed)
+                if (QueryInst!=null)
                 {
-                    cur.Close();
+                    QueryInst.Finish();
                 }
                 return false;
             }
@@ -42,7 +44,7 @@ namespace XENFCoreSharp.Bot.Filters
                                                                                                                // totally hax, I have to pull group configuration to check and see if the group has specific features enabled.
                                                                                                                // But I can't do that if I already have an SQL cursor open. So i'll have to read all of the results of it
 
-
+            cur = QueryInst.reader;
             // before I can make a call to get group configuration.
 
             var ib = 0;
@@ -68,7 +70,7 @@ namespace XENFCoreSharp.Bot.Filters
                
             
             }
-            cur.Close();  // close it up. 
+            QueryInst.Finish();  // close it up. 
 
             for (int i=0; i < captchaActivationIndices.Count; i++)
             {
@@ -77,9 +79,9 @@ namespace XENFCoreSharp.Bot.Filters
                 var user = new TGUser();
                 user.id = CurrentActivation.forwho;
                 chat.id = CurrentActivation.group;
-                var kicktime = XenforceRoot.getGroupConfigurationValueX(chat, "kicktime", 30);
-                var announce = XenforceRoot.getGroupConfigurationValueX(chat, "announcekicks",1);
-                var unmute = XenforceRoot.getGroupConfigurationValueX(chat, "muteuntilverified", false);
+                var kicktime = XenforceRoot.getGroupConfigurationValue(chat, "kicktime", 30);
+                var announce = XenforceRoot.getGroupConfigurationValue(chat, "announcekicks",1);
+                var unmute = XenforceRoot.getGroupConfigurationValue(chat, "muteuntilverified", false);
                 //Console.WriteLine("Wtf {0} {1}",CurrentActivation.activated,CurrentActivation.activation_checked);
                 if (CurrentActivation.activated==0)
                 {
@@ -89,7 +91,7 @@ namespace XENFCoreSharp.Bot.Filters
                         Telegram.kickChatMember(chat, user, 0); // kick them from the chat. 
                         Console.WriteLine("Remove user?");
                         var rar = 0;
-                        var ok = SQL2.NonQuery(string.Format("DELETE FROM xen_activations WHERE activation_id='{0}'", CurrentActivation.activation_id), out rar);
+                        var ok = SQL.NonQuery(string.Format("DELETE FROM xen_activations WHERE activation_id='{0}'", CurrentActivation.activation_id), out rar);
                         if (announce > 0)
                         {
                             var mymessage = Telegram.sendMessage(chat, CurrentActivation.username + " was removed from the chat for not completing the CAPTCHA.");
@@ -106,7 +108,7 @@ namespace XENFCoreSharp.Bot.Filters
                     Telegram.deleteMessage(chat, CurrentActivation.actmessage);
                     var mymessage = Telegram.sendMessage(chat, "@" + CurrentActivation.username + ", thanks for verifying you're not a robot.");
                     var ra = 0;
-                    var ok = SQL2.NonQuery("UPDATE xen_activations SET activation_checked=1 WHERE activation_id='" + SQL.escape(CurrentActivation.activation_id) + "'", out ra);
+                    var ok = SQL.NonQuery("UPDATE xen_activations SET activation_checked=1 WHERE activation_id='" + SQL.escape(CurrentActivation.activation_id) + "'", out ra);
                     if (!ok)
                     {
                         Console.WriteLine("Updating activation message failed! Might spam!!!?");
