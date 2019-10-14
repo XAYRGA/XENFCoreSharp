@@ -59,9 +59,34 @@ Automatically kicks users that post a link or photo before they complete the cap
 /xen setbool kickurlunactivated false -- to turn off
 
 
+**Change welcome message**
+
+Variables: 
+%NAME -- Users name 
+
+%ACTURL (Required) -- Activation URL 
+
+%DURATION -- Duration
+
+Example:
+
+/xen setwelcomemessage Welcome to my chat, %NAME. 
+
+Please complete the CAPTCHA here within %DURATION minutes: 
+
+%ACTURL
 
 
 
+
+**Change activation message**
+
+Variables: 
+%NAME -- Users name 
+
+Example:
+
+/xen setactivationmessage %NAME , thanks for completing the captcha. Enjoy the chat! 
 
 
 

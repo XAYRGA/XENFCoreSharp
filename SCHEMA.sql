@@ -30,18 +30,23 @@ CREATE TABLE IF NOT EXISTS `xenf_autokick` (
 
 -- Data exporting was unselected.
 -- Dumping structure for table xen3.xenf_groupconfigs
-CREATE TABLE IF NOT EXISTS `xenf_groupconfigs` (
-  `group` bigint(20) NOT NULL,
-  `autobannames` int(11) NOT NULL DEFAULT '1',
-  `kicktime` int(11) NOT NULL DEFAULT '30',
-  `message` text NOT NULL,
-  `autoban` int(11) NOT NULL DEFAULT '1',
-  `muteuntilverified` int(11) NOT NULL DEFAULT '0',
-  `announcekicks` int(11) NOT NULL DEFAULT '1',
-  `activationmode` int(11) NOT NULL DEFAULT '1',
-  `kickurlunactivated` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`group`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `xenf_groupconfigs` (
+	`group` BIGINT(20) NOT NULL,
+	`autobannames` INT(11) NOT NULL DEFAULT '1',
+	`kicktime` INT(11) NOT NULL DEFAULT '30',
+	`message` TEXT NOT NULL,
+	`autoban` INT(11) NOT NULL DEFAULT '1',
+	`muteuntilverified` INT(11) NOT NULL DEFAULT '0',
+	`announcekicks` INT(11) NOT NULL DEFAULT '1',
+	`activationmode` INT(11) NOT NULL DEFAULT '1',
+	`kickurlunactivated` INT(11) NOT NULL DEFAULT '1',
+	`activationmessage` TEXT NOT NULL,
+	PRIMARY KEY (`group`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
 
 -- Data exporting was unselected.
 -- Dumping structure for table xen3.xenf_spoken
