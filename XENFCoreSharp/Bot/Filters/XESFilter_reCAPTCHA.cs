@@ -106,7 +106,17 @@ namespace XENFCoreSharp.Bot.Filters
                 } else if (CurrentActivation.activated==1 && CurrentActivation.activation_checked==0)
                 {
                     Telegram.deleteMessage(chat, CurrentActivation.actmessage);
-                    var mymessage = Telegram.sendMessage(chat, "@" + CurrentActivation.username + ", thanks for verifying you're not a robot.");
+
+                    var Oldmsg = CurrentActivation.username + ", thanks for verifying you're not a robot.";
+                    var actiMsg = XenforceRoot.getGroupConfigurationValue(chat, "activationmessage", "%NAME, thanks for verifying you're not a robot.");
+                    if (actiMsg==null || actiMsg.Length < 5)
+                    {
+                        actiMsg = Oldmsg;
+                    }
+
+                    actiMsg = actiMsg.Replace("%NAME", CurrentActivation.username);
+
+                    var mymessage = Telegram.sendMessage(chat,actiMsg );
                     var ra = 0;
                     var ok = SQL.NonQuery("UPDATE xen_activations SET activation_checked=1 WHERE activation_id='" + SQL.escape(CurrentActivation.activation_id) + "'", out ra);
                     if (!ok)
@@ -140,25 +150,31 @@ namespace XENFCoreSharp.Bot.Filters
 
             if (q!=null)
             {
-                user_name_full = q;
-            }
+                user_name_full = "@" + q; // okay okay fine jeez.
+            } 
+          
             
             var muteUntilVerified = XenforceRoot.getGroupConfigurationValue(msg.chat, "muteuntilverified", false);
             var kicktime = XenforceRoot.getGroupConfigurationValue(msg.chat, "kicktime", 30);
             var instance_time = Helpers.getUnixTime();
-
-            var FullMessage = string.Format(
-                "Welcome, @{0}. \n" +
-                "to the chat! Please complete a quick captcha within {2} minutes to verify you're not a bot: \n\n" +
-                "{1}",
-
-                user_name_full,
-
-                "http://www.xayr.ga/xenf2/?actid=" + ActivationID,
-
-                kicktime
-
+        
+            var FullMessageOld = string.Format(
+                "Welcome, %NAME. \n" +
+                "Please complete a quick captcha within %DURATION minutes to verify you're not a bot: \n\n" +
+                "%ACTURL"
                 );
+
+            var FullMessage = XenforceRoot.getGroupConfigurationValue(msg.chat, "message", FullMessageOld);
+
+
+            if (FullMessage==null || FullMessage.Length < 10)
+            {
+                FullMessage = FullMessageOld;
+            }
+
+            FullMessage = FullMessage.Replace("%ACTURL", "http://www.xayr.ga/xenf2/?actid=" + ActivationID);
+            FullMessage = FullMessage.Replace("%DURATION", kicktime.ToString());
+            FullMessage = FullMessage.Replace("%NAME", user_name_full);
 
             if (muteUntilVerified == true)
             {

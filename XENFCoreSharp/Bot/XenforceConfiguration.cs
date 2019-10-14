@@ -246,7 +246,7 @@ namespace XENFCoreSharp.Bot
 
         public static bool writeGroupConfiguration(TGChat chat, string index, string value)
         {
-            var query = "UPDATE xenf_groupconfigs SET `{0}`={1} WHERE `group`={2}";
+            var query = "UPDATE xenf_groupconfigs SET `{0}`='{1}' WHERE `group`={2}";
 
             int ra = 0;
 

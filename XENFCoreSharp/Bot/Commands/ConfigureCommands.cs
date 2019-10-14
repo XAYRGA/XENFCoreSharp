@@ -104,6 +104,95 @@ namespace XENFCoreSharp.Bot.Commands
             }
         }
 
+        public static void setValuestring(TGMessage data, string[] arguments)
+        {
+            if (arguments.Length > 1)
+            {
+                var before = arguments[1];
+                var after = before == "true";
+
+                if (before == "true" || before == "false")
+                {
+                    var success = XenforceRoot.writeGroupConfiguration(data.chat, arguments[0], after);
+                    if (!success)
+                    {
+                        data.replySendMessage(string.Format("That didn't work. The configuration item {0} might not exist or is already this value.", arguments[0]));
+                    }
+                    else
+                    {
+                        data.replySendMessage(string.Format("Success, set {0} to {1}", arguments[0], before));
+                    }
+                }
+                else
+                {
+                    data.replySendMessage(string.Format("Sorry, I couldn't understand the value '{0}', you need to use a boolean (true/false).", before));
+                }
+            }
+            else
+            {
+                data.replySendMessage("The usage of this command is: setint <valname> <value>");
+            }
+        }
+
+        public static void setWelcomeMessage(TGMessage data, string[] arguments)
+        {
+            if (arguments.Length < 2)
+            {
+                data.replySendMessage("Failed to set welcome message. The message must include the object %ACTURL in it. It may optionally include the object %NAME, or %DURATION (Amount of time they have to verify) -- oh, and it needs to be at least two words.");
+                return;
+            }
+            var str = "";
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                    str += arguments[i] + " "; // Combine wordsssss
+            }
+            if (!str.Contains("%ACTURL"))
+            {
+                data.replySendMessage(string.Format("Failed to set welcome message. The message must include the object %ACTURL in it. It may optionally include the object %NAME."));
+                return;
+            }
+            var success = XenforceRoot.writeGroupConfiguration(data.chat, "message", str);
+            if (!success)
+            {
+                data.replySendMessage("Sorry, something went wrong when setting this option. I'd recommend contacting my creator, @xayrga -- I'm sure he can help you.");
+                return;
+            }
+            var msg = data.replySendMessage("OK. Successfully set the welcome message. I will now print an example, these messages will be cleaned up in 45 seconds -- so please get a good look at them before you walk away.");
+            XenforceRoot.AddCleanupMessage(data.chat.id, msg.message_id, 45);
+            str = str.Replace("%ACTURL", "http://xayr.ga/xenf2/iamabotandidontneedtoverify");
+            str = str.Replace("%DURATION", "30");
+            str = str.Replace("%NAME", "@xenfbot");
+            msg = data.replySendMessage(str);
+            XenforceRoot.AddCleanupMessage(data.chat.id, msg.message_id, 45);
+        }
+
+
+        public static void setActivationMessage(TGMessage data, string[] arguments)
+        {
+            if (arguments.Length < 2)
+            {
+                data.replySendMessage("Failed to set activation message.  It may optionally include the object %NAME, and must be two words long.");
+                return;
+            }
+            var str = "";
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                str += arguments[i] + " "; // Combine wordsssss
+            }
+
+            var success = XenforceRoot.writeGroupConfiguration(data.chat, "activationmessage", str);
+            if (!success)
+            {
+                data.replySendMessage("Sorry, something went wrong when setting this option. I'd recommend contacting my creator, @xayrga -- I'm sure he can help you.");
+                return;
+            }
+            var msg = data.replySendMessage("OK. Successfully set the activation message. I will now print an example, these messages will be cleaned up in 45 seconds -- so please get a good look at them before you walk away.");
+            XenforceRoot.AddCleanupMessage(data.chat.id, msg.message_id, 45);
+            str = str.Replace("%NAME", "@xenfbot");
+            msg = data.replySendMessage(str);
+        }
+
+
 
         public static void load()
         {
@@ -111,6 +200,8 @@ namespace XENFCoreSharp.Bot.Commands
             XenforceCommandInterpreter.AddCommand("getint", getValueInt);
             XenforceCommandInterpreter.AddCommand("setint", setValueInt);
             XenforceCommandInterpreter.AddCommand("setbool", setValuebool);
+            XenforceCommandInterpreter.AddCommand("setwelcomemessage", setWelcomeMessage);
+            XenforceCommandInterpreter.AddCommand("setactivationmessage", setActivationMessage);
         }
     }
 }
